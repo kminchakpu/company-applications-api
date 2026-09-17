@@ -369,7 +369,7 @@ Possible improvements include:
 
 ## Author
 
-Kevin Cross Minchakpu
+**Kevin Cross Minchakpu**
 
 Web Development Student
 
