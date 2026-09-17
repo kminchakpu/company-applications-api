@@ -62,8 +62,6 @@ job-application-tracker/
 └── README.md
 ```
 
-> The exact folder structure may vary slightly depending on your local project setup.
-
 ## API Endpoints
 
 ### Applications
