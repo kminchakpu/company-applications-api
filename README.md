@@ -89,7 +89,7 @@ job-application-tracker/
 ### 1. Clone the Repository
 
 ```bash
-git clone [YOUR_GITHUB_REPOSITORY_URL](https://github.com/kminchakpu/company-applications-api.git
+git clone https://github.com/kminchakpu/company-applications-api.git
 cd PROJECT_FOLDER
 ```
 
