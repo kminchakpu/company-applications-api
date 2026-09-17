@@ -369,10 +369,10 @@ Possible improvements include:
 
 ## Author
 
-**Kevin Cross Minchakpu**
+Kevin Cross Minchakpu
 
 Web Development Student
 
 ## License
 
-This project was created for educational purposes as part of a web services development course.
+This project was created for W03 Project: Project 2  (CRUD Operations) for educational purposes as part of a web services development course in CSE 341, BYUI.
