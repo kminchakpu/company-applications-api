@@ -10,6 +10,10 @@ const doc = {
       url: "http://localhost:8080",
       description: "Local development server",
     },
+    {
+      url: "https://company-applications-api.onrender.com/",
+      description: "Render production server",
+    },
   ],
   tags: [
     {
