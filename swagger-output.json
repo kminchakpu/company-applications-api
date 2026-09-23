@@ -2,8 +2,8 @@
   "openapi": "3.0.0",
   "info": {
     "title": "Job Application Tracker API",
-    "version": "1.0.0",
-    "description": "REST API for managing job applications and companies."
+    "version": "2.0.0",
+    "description": "REST API for managing job applications and companies. Authentication is provided through Google OAuth 2.0 using Passport. Application and company endpoints require an authenticated session."
   },
   "servers": [
     {
@@ -11,18 +11,22 @@
       "description": "Local development server"
     },
     {
-      "url": "https://company-applications-api.onrender.com/",
+      "url": "https://company-applications-api.onrender.com",
       "description": "Render production server"
     }
   ],
   "tags": [
     {
+      "name": "Authentication",
+      "description": "Google OAuth authentication endpoints"
+    },
+    {
       "name": "Applications",
-      "description": "Job application management endpoints"
+      "description": "Protected job application management endpoints"
     },
     {
       "name": "Companies",
-      "description": "Company management endpoints"
+      "description": "Protected company management endpoints"
     }
   ],
   "paths": {
@@ -36,28 +40,125 @@
         }
       }
     },
+    "/auth/google": {
+      "get": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Login with Google",
+        "description": "Starts the Google OAuth 2.0 authentication process and redirects the user to Google for login.",
+        "responses": {
+          "302": {
+            "description": "Redirects the user to Google for authentication"
+          }
+        }
+      }
+    },
+    "/auth/google/callback": {
+      "get": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Google OAuth callback",
+        "description": "Handles the callback from Google after authentication. Successful authentication creates a user session.",
+        "responses": {
+          "302": {
+            "description": "Authentication successful and user is redirected to profile"
+          },
+          "401": {
+            "description": "Google authentication failed"
+          }
+        }
+      }
+    },
+    "/auth/profile": {
+      "get": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Get authenticated user profile",
+        "description": "Returns the profile information of the currently authenticated Google user.",
+        "responses": {
+          "200": {
+            "description": "Authenticated user profile returned successfully"
+          },
+          "401": {
+            "description": "Authentication required"
+          }
+        },
+        "security": [
+          {
+            "sessionAuth": []
+          }
+        ]
+      }
+    },
+    "/auth/failure": {
+      "get": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Authentication failure",
+        "description": "Returns an error response when Google OAuth authentication fails.",
+        "responses": {
+          "401": {
+            "description": "Google authentication failed"
+          }
+        }
+      }
+    },
+    "/auth/logout": {
+      "get": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Logout current user",
+        "description": "Logs out the authenticated user and destroys the current session.",
+        "responses": {
+          "200": {
+            "description": "Logged out successfully"
+          },
+          "500": {
+            "description": "Error while logging out"
+          }
+        },
+        "security": [
+          {
+            "sessionAuth": []
+          }
+        ]
+      }
+    },
     "/applications/": {
       "get": {
         "tags": [
           "Applications"
         ],
         "summary": "Get all job applications",
-        "description": "Returns all job applications stored in the database.",
+        "description": "Returns all job applications stored in the database. Authentication is required.",
         "responses": {
           "200": {
             "description": "Applications retrieved successfully"
           },
+          "401": {
+            "description": "Authentication required"
+          },
           "500": {
             "description": "Error retrieving applications"
           }
-        }
+        },
+        "security": [
+          {
+            "sessionAuth": []
+          }
+        ]
       },
       "post": {
         "tags": [
           "Applications"
         ],
         "summary": "Create a new job application",
-        "description": "Creates a new job application in MongoDB.",
+        "description": "Creates a new job application in MongoDB. Authentication is required.",
         "responses": {
           "201": {
             "description": "Application created successfully"
@@ -65,10 +166,18 @@
           "400": {
             "description": "Validation failed or required fields are missing"
           },
+          "401": {
+            "description": "Authentication required"
+          },
           "500": {
             "description": "Error creating application"
           }
         },
+        "security": [
+          {
+            "sessionAuth": []
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -87,7 +196,7 @@
           "Applications"
         ],
         "summary": "Get a job application by ID",
-        "description": "Returns one job application using its MongoDB ObjectId.",
+        "description": "Returns one job application using its MongoDB ObjectId. Authentication is required.",
         "parameters": [
           {
             "name": "id",
@@ -106,20 +215,28 @@
           "400": {
             "description": "Invalid application ID"
           },
+          "401": {
+            "description": "Authentication required"
+          },
           "404": {
             "description": "Application not found"
           },
           "500": {
             "description": "Error retrieving application"
           }
-        }
+        },
+        "security": [
+          {
+            "sessionAuth": []
+          }
+        ]
       },
       "put": {
         "tags": [
           "Applications"
         ],
         "summary": "Update a job application",
-        "description": "Updates an existing job application using its MongoDB ObjectId.",
+        "description": "Updates an existing job application using its MongoDB ObjectId. Authentication is required.",
         "parameters": [
           {
             "name": "id",
@@ -138,6 +255,9 @@
           "400": {
             "description": "Invalid ID or validation failed"
           },
+          "401": {
+            "description": "Authentication required"
+          },
           "404": {
             "description": "Application not found"
           },
@@ -145,6 +265,11 @@
             "description": "Error updating application"
           }
         },
+        "security": [
+          {
+            "sessionAuth": []
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -161,7 +286,7 @@
           "Applications"
         ],
         "summary": "Delete a job application",
-        "description": "Deletes a job application using its MongoDB ObjectId.",
+        "description": "Deletes a job application using its MongoDB ObjectId. Authentication is required.",
         "parameters": [
           {
             "name": "id",
@@ -180,13 +305,21 @@
           "400": {
             "description": "Invalid application ID"
           },
+          "401": {
+            "description": "Authentication required"
+          },
           "404": {
             "description": "Application not found"
           },
           "500": {
             "description": "Error deleting application"
           }
-        }
+        },
+        "security": [
+          {
+            "sessionAuth": []
+          }
+        ]
       }
     },
     "/companies/": {
@@ -195,22 +328,30 @@
           "Companies"
         ],
         "summary": "Get all companies",
-        "description": "Returns all companies stored in the database.",
+        "description": "Returns all companies stored in the database. Authentication is required.",
         "responses": {
           "200": {
             "description": "Companies retrieved successfully"
           },
+          "401": {
+            "description": "Authentication required"
+          },
           "500": {
             "description": "Error retrieving companies"
           }
-        }
+        },
+        "security": [
+          {
+            "sessionAuth": []
+          }
+        ]
       },
       "post": {
         "tags": [
           "Companies"
         ],
         "summary": "Create a new company",
-        "description": "Creates a new company in MongoDB.",
+        "description": "Creates a new company in MongoDB. Authentication is required.",
         "responses": {
           "201": {
             "description": "Company created successfully"
@@ -218,10 +359,18 @@
           "400": {
             "description": "Validation failed or required fields are missing"
           },
+          "401": {
+            "description": "Authentication required"
+          },
           "500": {
             "description": "Error creating company"
           }
         },
+        "security": [
+          {
+            "sessionAuth": []
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -240,7 +389,7 @@
           "Companies"
         ],
         "summary": "Get a company by ID",
-        "description": "Returns one company using its MongoDB ObjectId.",
+        "description": "Returns one company using its MongoDB ObjectId. Authentication is required.",
         "parameters": [
           {
             "name": "id",
@@ -259,20 +408,28 @@
           "400": {
             "description": "Invalid company ID"
           },
+          "401": {
+            "description": "Authentication required"
+          },
           "404": {
             "description": "Company not found"
           },
           "500": {
             "description": "Error retrieving company"
           }
-        }
+        },
+        "security": [
+          {
+            "sessionAuth": []
+          }
+        ]
       },
       "put": {
         "tags": [
           "Companies"
         ],
         "summary": "Update a company",
-        "description": "Updates an existing company using its MongoDB ObjectId.",
+        "description": "Updates an existing company using its MongoDB ObjectId. Authentication is required.",
         "parameters": [
           {
             "name": "id",
@@ -291,6 +448,9 @@
           "400": {
             "description": "Invalid ID or validation failed"
           },
+          "401": {
+            "description": "Authentication required"
+          },
           "404": {
             "description": "Company not found"
           },
@@ -298,6 +458,11 @@
             "description": "Error updating company"
           }
         },
+        "security": [
+          {
+            "sessionAuth": []
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -314,7 +479,7 @@
           "Companies"
         ],
         "summary": "Delete a company",
-        "description": "Deletes a company using its MongoDB ObjectId.",
+        "description": "Deletes a company using its MongoDB ObjectId. Authentication is required.",
         "parameters": [
           {
             "name": "id",
@@ -333,17 +498,33 @@
           "400": {
             "description": "Invalid company ID"
           },
+          "401": {
+            "description": "Authentication required"
+          },
           "404": {
             "description": "Company not found"
           },
           "500": {
             "description": "Error deleting company"
           }
-        }
+        },
+        "security": [
+          {
+            "sessionAuth": []
+          }
+        ]
       }
     }
   },
   "components": {
+    "securitySchemes": {
+      "sessionAuth": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "connect.sid",
+        "description": "Session cookie created after successful Google OAuth authentication."
+      }
+    },
     "schemas": {
       "Application": {
         "type": "object",

@@ -2,8 +2,9 @@ const swaggerAutogen = require("swagger-autogen")({ openapi: "3.0.0" });
 const doc = {
   info: {
     title: "Job Application Tracker API",
-    version: "1.0.0",
-    description: "REST API for managing job applications and companies.",
+    version: "2.0.0",
+    description:
+      "REST API for managing job applications and companies. Authentication is provided through Google OAuth 2.0 using Passport. Application and company endpoints require an authenticated session.",
   },
   servers: [
     {
@@ -11,21 +12,34 @@ const doc = {
       description: "Local development server",
     },
     {
-      url: "https://company-applications-api.onrender.com/",
+      url: "https://company-applications-api.onrender.com",
       description: "Render production server",
     },
   ],
   tags: [
     {
+      name: "Authentication",
+      description: "Google OAuth authentication endpoints",
+    },
+    {
       name: "Applications",
-      description: "Job application management endpoints",
+      description: "Protected job application management endpoints",
     },
     {
       name: "Companies",
-      description: "Company management endpoints",
+      description: "Protected company management endpoints",
     },
   ],
   components: {
+    securitySchemes: {
+      sessionAuth: {
+        type: "apiKey",
+        in: "cookie",
+        name: "connect.sid",
+        description:
+          "Session cookie created after successful Google OAuth authentication.",
+      },
+    },
     schemas: {
       Application: {
         jobTitle: "Backend Developer",
