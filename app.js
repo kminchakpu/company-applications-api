@@ -13,7 +13,18 @@ const authRoutes = require("./routes/authRoutes");
 const app = express();
 const PORT = process.env.PORT || 8080;
 
-app.use(cors());
+const allowedOrigins = [
+  "http://localhost:8080",
+  "https://company-applications-api.onrender.com",
+];
+
+app.use(
+  cors({
+    origin: allowedOrigins,
+    credentials: true,
+  })
+);
+
 app.use(express.json());
 
 // Trust Render's reverse proxy in production.
@@ -62,8 +73,20 @@ connectDatabase()
   .then(() => {
     app.listen(PORT, () => {
       console.log(`Server is running on port ${PORT}`);
+      console.log("");
+      console.log("Local:");
+      console.log(`API: http://localhost:${PORT}`);
       console.log(`Swagger documentation: http://localhost:${PORT}/api-docs`);
       console.log(`Google login: http://localhost:${PORT}/auth/google`);
+      console.log("");
+      console.log("Render:");
+      console.log("API: https://company-applications-api.onrender.com");
+      console.log(
+        "Swagger documentation: https://company-applications-api.onrender.com/api-docs"
+      );
+      console.log(
+        "Google login: https://company-applications-api.onrender.com/auth/google"
+      );
     });
   })
   .catch((error) => {
